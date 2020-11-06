@@ -1,10 +1,15 @@
 import { Snowflake } from 'snowflake-promise'
+import { subDays, startOfDay, endOfDay } from 'date-fns/fp'
+import { format } from 'date-fns'
+import * as R from 'ramda'
+
+let cachedCafePosData: CafePosData[] = []
 
 const snowflake = new Snowflake({
   account: process.env.ACCOUNT,
   username: process.env.USERNAME,
   password: process.env.PASSWORD,
-  schema: 'JUNCTION_2020',
+  schema: 'TEAM_09',
   warehouse: 'WH01',
   database: 'DEV_EDW_JUNCTION',
 })
@@ -24,7 +29,7 @@ type CafePosData = {
   itemUnit: string
   itemNormalPrice: number
 }
-
+/*
 type WebshopData = {
   address: string
   city: string
@@ -38,7 +43,7 @@ type WebshopData = {
   zipCode: string
   orderNumber: number
 }
-
+*/
 export const connect = () => snowflake.connect()
 
 const parseCafePosData = (result: any[]): CafePosData[] =>
@@ -57,7 +62,7 @@ const parseCafePosData = (result: any[]): CafePosData[] =>
     itemUnit: item.ITEM_UNIT,
     itemNormalPrice: item.ITEM_NORMAL_PRICE,
   }))
-
+/*
 const parseWarehouseData = (result: any[]): WebshopData[] =>
   result.map(item => ({
     address: item.ADDRESS,
@@ -72,9 +77,65 @@ const parseWarehouseData = (result: any[]): WebshopData[] =>
     zipCode: item.ZIP_CODE,
     orderNumber: item.ORDER_NUMBER,
   }))
-
-export const getCafePosData = () =>
+*/
+const getCafePosData = () =>
   snowflake.execute('select * from cafe_pos_data').then(parseCafePosData)
-
-export const getWarehouseData = () =>
+/*
+const getWarehouseData = () =>
   snowflake.execute('select * from webshop_data').then(parseWarehouseData)
+*/
+export const startCafePosDataPoll = async (timeMs: number) => {
+  cachedCafePosData = await getCafePosData()
+  setInterval(
+    () =>
+      getCafePosData().then(data => {
+        cachedCafePosData = data
+      }),
+    timeMs
+  )
+}
+
+/*
+const getCafePosDataForProduct = (productId: string) =>
+  snowflake
+    .execute('select * from cafe_pos_data where ITEM_CODE = ?', [productId])
+    .then(parseCafePosData)
+    */
+
+const resolveLast30Days = (events: CafePosData[]) => {
+  const now = new Date()
+  const scanEnd = R.pipe(subDays(1), endOfDay)
+  const scanBegin = R.pipe(subDays(30), startOfDay)
+
+  return R.pipe(
+    (events: CafePosData[]) =>
+      R.filter(
+        ({ headerBookingDate }) =>
+          headerBookingDate >= scanBegin(now) &&
+          headerBookingDate <= scanEnd(now),
+        events
+      ),
+    R.groupBy(({ headerBookingDate }) =>
+      format(headerBookingDate, 'dd.LL.yyyy')
+    ),
+    R.mapObjIndexed(i => i.length)
+  )(events)
+}
+
+const resolveConsumedToday = (events: CafePosData[]) => {
+  const now = new Date()
+  return events.filter(
+    ({ headerBookingDate }) => headerBookingDate >= startOfDay(now)
+  ).length
+}
+
+export const getInsightsForProduct = (productId: number) => {
+  const filtered = cachedCafePosData.filter(
+    event => event.itemCode === productId
+  )
+  return {
+    id: productId,
+    consumedToday: resolveConsumedToday(filtered),
+    consumedLastMonth: resolveLast30Days(filtered),
+  }
+}

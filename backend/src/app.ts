@@ -1,21 +1,24 @@
 import dotenv from 'dotenv'
-import { Snowflake } from 'snowflake-promise'
-
 dotenv.config()
+import { getCafePosData, connect, getWarehouseData } from './service/data-lake'
+import express from 'express'
 
-const snowflake = new Snowflake({
-  account: process.env.ACCOUNT,
-  username: process.env.USERNAME,
-  password: process.env.PASSWORD,
-  schema: 'JUNCTION_2020',
-  warehouse: 'WH01',
-  database: 'DEV_EDW_JUNCTION',
-})
+const app = express()
 
-const app = async () => {
-  await snowflake.connect()
-  const result = await snowflake.execute('select * from cafe_pos_data')
-  console.log(result)
-}
+const PORT = process.env.PORT || 3000
 
-app()
+connect()
+  .then(() => console.log('Connected to snowflake'))
+  .catch(e => {
+    console.error('Error connecting to snowflake', e)
+  })
+
+app.get('/api/cafe', (req, res) =>
+  getCafePosData().then(data => res.json(data))
+)
+
+app.get('/api/warehouse', (req, res) =>
+  getWarehouseData().then(data => res.json(data))
+)
+
+app.listen(3000, () => console.log('Listening on', PORT, '💩'))

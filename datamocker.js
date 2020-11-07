@@ -9,22 +9,40 @@ const scuffedRand = () => {
   return 1;
 };
 
-// For demo purposes. Give an JSON file with valid purchase events and iterate through it 1 request at a time. Takes around 1min for 1000 requests
-// purchase event returns the uniqueReviewID, which is then used to post the review event
-async function app() {
-  for (const purchase of mockjson) {
-    await axios
-      .post("http://localhost:3000/api/purchase", purchase)
-      .then((res) => res.data)
-      .then(({ uniqueReviewId }) => {
-        console.log({ uniqueReviewId });
-        axios.post("http://localhost:3000/api/review", {
-          review_uniqueID: uniqueReviewId,
-          review: scuffedRand(),
-          review_ts: purchase.HEADER_BOOKINGDATE,
-        });
+async function postPurchase() {
+  const randPurchase = mockjson[Math.floor(Math.random() * mockjson.length)];
+  randPurchase.HEADER_BOOKINGDATE = new Date();
+  await axios
+    .post("http://localhost:3000/api/purchase", randPurchase)
+    .then((res) => res.data)
+    .then(({ uniqueReviewId }) => {
+      console.log({ uniqueReviewId });
+      axios.post("http://localhost:3000/api/review", {
+        review_uniqueID: uniqueReviewId,
+        review: scuffedRand(),
+        review_ts: randPurchase.HEADER_BOOKINGDATE,
       });
-  }
+    });
 }
 
-app();
+setInterval(postPurchase, 15000);
+
+// For demo purposes. Give an JSON file with valid purchase events and iterate through it 1 request at a time. Takes around 1min for 1000 requests
+// purchase event returns the uniqueReviewID, which is then used to post the review event
+// async function app() {
+//   for (const purchase of mockjson) {
+//     await axios
+//       .post("http://localhost:3000/api/purchase", purchase)
+//       .then((res) => res.data)
+//       .then(({ uniqueReviewId }) => {
+//         console.log({ uniqueReviewId });
+//         axios.post("http://localhost:3000/api/review", {
+//           review_uniqueID: uniqueReviewId,
+//           review: scuffedRand(),
+//           review_ts: purchase.HEADER_BOOKINGDATE,
+//         });
+//       });
+//   }
+// }
+
+// app();

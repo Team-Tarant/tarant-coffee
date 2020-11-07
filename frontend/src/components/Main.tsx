@@ -31,12 +31,14 @@ const Main: React.FC<Props> = ({ }) => {
     <Col>
       <Col>
         <ProductSelect setProduct={setProductId} />
-        {productId &&
+        {productId && !productData ? <Loading /> :
+          productId &&
           <div>
-            {productData ?
-              <Product productData={productData} /> : <Loading />
+            {productData &&
+              <Product productData={productData} />
             }
           </div>
+
         }
       </Col>
     </Col>

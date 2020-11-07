@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import axios from 'axios'
+import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
 
-import InfoLabel from './InfoLabel';
+import ProductSelect from './ProductSelect'
+import Product from './Product'
 
-import { Theme } from '../styles';
+import { fetchProductData } from '../lib/data'
+
+import { Theme } from '../styles'
 
 type Props = {}
 
@@ -15,28 +17,21 @@ type Insights = {
 }
 
 const Main: React.FC<Props> = ({ }) => {
-  const [productId, setProductId] = useState(0)
+  const [productId, setProductId] = useState<number | null>(null)
   const [productData, setProductData] = useState<Insights | null>(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await axios(
-        'http://localhost:3000/api/insights/8569864530471244163'
-      )
-      console.log('result gotted', result)
-      setProductData(result.data)
-    }
-    fetchData()
-  }, [])
+    if (productId)
+      fetchProductData(productId).then(setProductData)
+  }, [productId])
 
   return (
     <Col>
       <Col>
-        <Heading>Product X</Heading>
-        <Container>
-          <InfoLabel label={'sold today'} value={productData?.consumedToday}/>
-          <InfoLabel label={'sold yesterday'} value={100}/>
-        </Container>
+        <ProductSelect setProduct={setProductId}/>
+        { productId && productData &&
+          <Product productData={productData}/>
+        }
       </Col>
     </Col>
   )
@@ -49,21 +44,10 @@ const Col: any = styled.div`
   padding: 5px;
 `;
 
-
-const Container: any = styled.div`
-  display: flex;
-  margin: 5px;
+const Row: any = styled.div`
+  display:flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-`;
-
-const Heading: any = styled.p`
-  color: ${Theme.color.primary};
-  font-family: ${Theme.font.secondary};
-  font-size: 3rem;
-  margin: 0;
-`;
+`
 
 const Loading: any = styled.img.attrs(() => ({
   src: require('../assets/loading.svg'),

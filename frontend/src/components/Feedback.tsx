@@ -1,22 +1,42 @@
-import React, { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import styled from 'styled-components'
 
 import { Theme } from '../styles'
 
 const Feedback:React.FC = () => {
-  const [input, setInput] = useState<string>('')
+  const [id, setId] = useState<string>('')
+  const [validId, setValidId] = useState<Boolean>(false)
 
   const handleInput = (event) => {
-    event.target.value.length <= 20 && setInput(event.target.value)
+    event.target.value.length <= 20 && setId(event.target.value)
   }
 
+  const submitId = () => {
+    console.log('id submit', id)
+    setValidId(true)
+  }
+
+  const submitFeedback = (rating: number) => {
+    console.log('submitted feedback')
+  }
   
   return (
-    <Col>
-      <Heading>Give your unique id</Heading>
-      <Input value={input} onChange={handleInput}/>
-      <Button>Next</Button>
-    </Col>
+      <Col>
+        {validId ?
+          <Fragment>
+            <Heading>Give your unique id</Heading>
+            <Input value={id} onChange={handleInput}/>
+            <Button onClick={submitId}>Next</Button>
+          </Fragment>
+        : <Fragment>
+            <Heading>How did you enjoy your Paulig experience?</Heading>
+            <FeedbackRow>
+              <FeedbackButton onClick={() => submitFeedback(-1)}>💩</FeedbackButton>
+              <FeedbackButton onClick={() => submitFeedback(0)}>🤷‍♀️</FeedbackButton>
+              <FeedbackButton onClick={() => submitFeedback(1)}>😋</FeedbackButton>
+            </FeedbackRow>
+          </Fragment>}
+      </Col>
   )
 }
 
@@ -24,13 +44,13 @@ const Feedback:React.FC = () => {
 const Col: any = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 500px;
+  max-width: 400px;
   margin: 0 auto;
   align-items: center;
 `
 
 const Heading: any = styled.h1`
-  
+  text-align: center;
 `
 
 const Input: any = styled.input`
@@ -53,6 +73,24 @@ const Button: any = styled.button`
   width: 90px;
   margin-top: 10px;
   font-size: 1.2rem;
+  outline: none;
+`
+
+const FeedbackRow: any = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-top: 10%;
+`
+
+const FeedbackButton: any = styled.button`
+  height: 80px;
+  width: 80px;
+  font-size: 2rem;
+  background-color: ${ Theme.color.tertiary };
+  border: 3px solid ${ Theme.color.primary };
+  border-radius: 1rem;
 `
 
 

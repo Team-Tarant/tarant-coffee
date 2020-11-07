@@ -9,6 +9,7 @@ import {
   getEventHubProperties,
   postPurchase,
   postReview,
+  //postCustomEvent,
 } from './service/event-hub'
 import express from 'express'
 import bodyParser from 'body-parser'
@@ -53,5 +54,11 @@ app.post('/api/review', (req, res) =>
     .then(() => res.json('Review posted succesfully'))
     .catch(err => console.error(err))
 )
+
+// app.post('/api/custom/:eventType', (req, res) =>
+//   postCustomEvent(req.params.eventType, req.body)
+//     .then(() => res.json('Custom data posted successfully'))
+//     .catch(err => console.error(err))
+// )
 
 app.listen(3000, () => console.log('Listening on', PORT, '💩'))

@@ -4,6 +4,12 @@ import { format } from 'date-fns'
 import * as R from 'ramda'
 import { Review } from './event-hub'
 
+const whitelistedProducts = [
+  8569864530471244163,
+  -6433072210751770779,
+  3283340315810741494,
+]
+
 const snowflake = new Snowflake({
   account: process.env.ACCOUNT,
   username: process.env.USERNAME,
@@ -106,7 +112,7 @@ const resolveLast30Days = (events: CafePosData[]) => {
     R.groupBy(({ headerBookingDate }) =>
       format(headerBookingDate, 'dd.LL.yyyy')
     ),
-    R.mapObjIndexed(i => i.reduce((p, c) => p + c.itemAmount, 0))
+    R.mapObjIndexed(i => i.reduce((p, c) => p + c.itemQty, 0))
   )(events)
 }
 
@@ -114,7 +120,7 @@ const resolveConsumedToday = (events: CafePosData[]) => {
   const now = new Date()
   return events
     .filter(({ headerBookingDate }) => headerBookingDate >= startOfDay(now))
-    .reduce((p, c) => p + c.itemAmount, 0)
+    .reduce((p, c) => p + c.itemQty, 0)
 }
 
 const resolveSatisfaction = (events: CafePosData[]) => {
@@ -122,7 +128,8 @@ const resolveSatisfaction = (events: CafePosData[]) => {
     .map(({ uniqueReviewId }) => uniqueReviewId)
     .filter(i => !!i)
   return getReviewsByIds(R.uniq(reviewIds)).then(
-    reviews => (reviews.reduce((p, c) => p + c.review, 0) / reviews.length) * 10
+    reviews =>
+      (R.sum(reviews.map(({ review }) => review)) / reviews.length) * 10
   )
 }
 
@@ -141,6 +148,17 @@ export const getInsightsForProduct = (productId: number) =>
     }))
 
 export const getProducts = () =>
-  snowflake
-    .execute('select distinct(ITEM_CODE) from team_09.cafe_pos_data')
-    .then(data => data.map(({ ITEM_CODE }) => ITEM_CODE))
+  Promise.all([
+    snowflake.execute('select distinct(ITEM_CODE) from team_09.cafe_pos_data'),
+    snowflake.execute(
+      `select distinct(ITEM_CODE) from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}`
+    ),
+  ])
+    .then(([p1, p2]) => [...p1, ...p2])
+    .then(
+      R.pipe(
+        R.map(({ ITEM_CODE }) => Number(ITEM_CODE)),
+        R.filter<number>(i => whitelistedProducts.includes(i)),
+        R.uniq
+      )
+    )

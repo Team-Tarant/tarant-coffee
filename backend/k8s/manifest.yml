@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: tarant-paulig
-          image: registry.digitalocean.com/merg-registry/tarant-paulig:v8
+          image: registry.digitalocean.com/merg-registry/tarant-paulig:v11
           ports:
             - containerPort: 3000
           env:
@@ -51,4 +51,4 @@ spec:
                   name: tarant-paulig-secrets
                   key: EVENTHUB_CONNECTION
             - name: TABLEVERSION
-              value: '5'
+              value: '7'

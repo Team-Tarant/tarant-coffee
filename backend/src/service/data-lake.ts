@@ -31,19 +31,19 @@ export const connect = () => snowflake.connect()
 
 const parseCafePosData = (result: any[]): CafePosData[] =>
   result.map(item => ({
-    headerId: item.HEADER_ID,
-    itemId: item.ITEM_ID,
-    headerBookingDate: item.HEADER_BOOKINGDATE,
+    headerId: Number(item.HEADER_ID),
+    itemId: Number(item.ITEM_ID),
+    headerBookingDate: new Date(item.HEADER_BOOKINGDATE),
     headerJournaltime: item.HEADER_JOURNALTIME,
     headerTerminal: item.HEADER_TERMINAL,
     headerCashier: item.HEADER_CASHIER,
-    headerTotal: item.HEADER_TOTAL,
-    itemCode: item.ITEM_CODE,
-    itemDescription: item.ITEM_DESCRIPTION,
-    itemAmount: item.ITEM_AMT,
-    itemQty: item.ITEM_QTY,
+    headerTotal: Number(item.HEADER_TOTAL),
+    itemCode: Number(item.ITEM_CODE),
+    itemDescription: Number(item.ITEM_DESCRIPTION),
+    itemAmount: Number(item.ITEM_AMT),
+    itemQty: Number(item.ITEM_QTY),
     itemUnit: item.ITEM_UNIT,
-    itemNormalPrice: item.ITEM_NORMAL_PRICE,
+    itemNormalPrice: Number(item.ITEM_NORMAL_PRICE),
   }))
 
 const getCafePosData = (productId: number) =>
@@ -54,6 +54,18 @@ const getCafePosData = (productId: number) =>
     )
     .then(parseCafePosData)
     .then(R.filter(({ itemCode }) => itemCode === productId))
+
+const getNewCafePosData = (productId: number) =>
+  snowflake
+    .execute('select * from x_pub_team_09.cafe_pos_data_v3', [productId])
+    .then(parseCafePosData)
+    .then(
+      R.filter(
+        ({ headerBookingDate, itemCode }) =>
+          productId === itemCode &&
+          headerBookingDate >= R.pipe(subDays(30), startOfDay)(new Date())
+      )
+    )
 
 const resolveLast30Days = (events: CafePosData[]) => {
   const now = new Date()
@@ -87,11 +99,16 @@ const resolveConsumedToday = (events: CafePosData[]) => {
   in the database.
 */
 export const getInsightsForProduct = (productId: number) =>
-  getCafePosData(productId).then(data => ({
-    id: productId,
-    consumedToday: resolveConsumedToday(data),
-    consumedLastMonth: resolveLast30Days(data),
-  }))
+  Promise.all([getCafePosData(productId), getNewCafePosData(productId)])
+    .then(([oldData, newData]) => {
+      console.log(newData)
+      return [...newData, ...oldData]
+    })
+    .then(data => ({
+      id: productId,
+      consumedToday: resolveConsumedToday(data),
+      consumedLastMonth: resolveLast30Days(data),
+    }))
 
 export const getProducts = () =>
   snowflake

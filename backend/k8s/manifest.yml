@@ -45,3 +45,8 @@ spec:
                 secretKeyRef:
                   name: tarant-paulig-secrets
                   key: PASSWORD
+            - name: EVENTHUB_CONNECTION
+              valueFrom:
+                secretKeyRef:
+                  name: tarant-paulig-secrets
+                  key: EVENTHUB_CONNECTION

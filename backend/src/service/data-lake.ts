@@ -57,7 +57,10 @@ const getCafePosData = (productId: number) =>
 
 const getNewCafePosData = (productId: number) =>
   snowflake
-    .execute('select * from x_pub_team_09.cafe_pos_data_v3', [productId])
+    .execute(
+      `select * from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}`,
+      [productId]
+    )
     .then(parseCafePosData)
     .then(
       R.filter(
@@ -100,10 +103,7 @@ const resolveConsumedToday = (events: CafePosData[]) => {
 */
 export const getInsightsForProduct = (productId: number) =>
   Promise.all([getCafePosData(productId), getNewCafePosData(productId)])
-    .then(([oldData, newData]) => {
-      console.log(newData)
-      return [...newData, ...oldData]
-    })
+    .then(([oldData, newData]) => [...newData, ...oldData])
     .then(data => ({
       id: productId,
       consumedToday: resolveConsumedToday(data),

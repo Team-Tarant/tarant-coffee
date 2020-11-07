@@ -14,7 +14,8 @@ export type Insights = {
   consumedLastMonth: { [key: string]: number },
   consumedToday: number,
   id: number,
-  satisfaction: number
+  satisfaction: number,
+  todTrend: {[key: string]: {[key:string]: number}},
 }
 
 const Main: React.FC<Props> = ({ }) => {
@@ -64,11 +65,6 @@ const Col: any = styled.div`
   flex: 1;
   padding: 5px;
 `;
-
-const Row: any = styled.div`
-  display:flex;
-  flex-direction: row;
-`
 
 const Loading: any = styled.img.attrs(() => ({
   src: require('../assets/LoadingIndicator.svg').default,

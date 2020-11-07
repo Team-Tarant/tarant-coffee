@@ -25,6 +25,8 @@ const Row: any = styled.div`
   margin: 2px;
   max-height: 5rem;
   padding: 0.2rem;
+  background-color: ${ Theme.color.tertiary };
+  padding: 7px;
 `;
 
 const Text: any = styled.div`

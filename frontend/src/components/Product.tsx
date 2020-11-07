@@ -4,6 +4,7 @@ import moment from 'moment'
 
 import InfoLabel from './InfoLabel'
 import LastMonthChart from './LastMonthChart'
+import TodTrendChart from './TodTrendChart'
 import { Theme } from '../styles'
 import { Insights } from './Main'
 
@@ -19,16 +20,19 @@ const getPreviousDaySales = (consumedLastMonth: { [key: string]: number }): numb
 }
 
 const Product: React.FC<Props> = ({ productData, productName }) => {
-  const { id, consumedToday, consumedLastMonth, satisfaction } = productData
+  const { id, consumedToday, consumedLastMonth, satisfaction, todTrend } = productData
   const soldYesterday: number = getPreviousDaySales(consumedLastMonth)
   return (
     <div>
       <Heading>{productName}</Heading>
       <Container>
-        <InfoLabel label={'sold today'} value={consumedToday} />
-        <InfoLabel label={'sold yesterday'} value={soldYesterday} />
-        <InfoLabel label={'satisfaction'} value={satisfaction} />
+        <Row>
+          <InfoLabel label={'sold today'} value={consumedToday} />
+          <InfoLabel label={'sold yesterday'} value={soldYesterday} />
+          <InfoLabel label={'satisfaction'} value={satisfaction} />
+        </Row>
         <LastMonthChart consumedLastMonth={consumedLastMonth} />
+        <TodTrendChart todTrend={todTrend}/>
       </Container>
     </div>
   )
@@ -37,10 +41,17 @@ const Product: React.FC<Props> = ({ productData, productName }) => {
 const Container: any = styled.div`
   display: flex;
   margin: 5px;
+  flex-direction: column;
+`;
+
+
+const Row: any = styled.div`
+  display:flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-items: flex-start;
-`;
+  justify-content: space-between;
+  margin: 5px 0;
+`
 
 const Heading: any = styled.p`
   color: ${Theme.color.primary};

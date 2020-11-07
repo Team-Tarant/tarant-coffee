@@ -4,6 +4,7 @@ import moment from 'moment'
 
 import styled from 'styled-components'
 
+import { Theme } from '../styles'
 
 type Props = {
   consumedLastMonth: {[key: string]:number},
@@ -29,7 +30,15 @@ const LastMonthChart:React.FC<Props> = ({ consumedLastMonth }) => {
     },
     xaxis: {
       categories: dates
-    }
+    },
+    grid:{
+      yaxis: {
+        lines: {
+            show: false
+        }}},
+    title: {
+      text: 'Sales (last 30 days)'
+    },
   })
   
   const [series, setSeries] = useState({
@@ -46,12 +55,12 @@ const LastMonthChart:React.FC<Props> = ({ consumedLastMonth }) => {
       setWidth(window.innerWidth > 900 ? 900 : window.innerWidth * 0.9)
     }
 
-  window.addEventListener("resize", handleResize)
-  
-  handleResize()
+    window.addEventListener("resize", handleResize)
+    
+    handleResize()
 
-  return () => window.removeEventListener("resize", handleResize)
-}, [])
+    return () => window.removeEventListener("resize", handleResize)
+  }, [])
 
   return (
     <ChartBlock>
@@ -66,7 +75,9 @@ const LastMonthChart:React.FC<Props> = ({ consumedLastMonth }) => {
 }
 
 const ChartBlock: any = styled.div`
-  background-color: white;
+  background-color: ${ Theme.color.tertiary };
+  border-radius: 1rem;
+  margin: 5px 0;
 `
 
 export default LastMonthChart

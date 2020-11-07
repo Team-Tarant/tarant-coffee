@@ -5,7 +5,7 @@ import { Theme } from '../styles';
 
 type Props = {
   label: string,
-  value: number,
+  value?: number,
 }
 
 const InfoLabel: React.FC<Props> = ({label, value }) => {

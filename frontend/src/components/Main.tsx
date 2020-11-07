@@ -8,16 +8,23 @@ import { Theme } from '../styles';
 
 type Props = {}
 
-const Main: React.FC<Props> = ({ }) => {
+type Insights = {
+  consumedLastMonth: {[key: string]:number},
+  consumedToday: number,
+  id: number,
+}
 
-  const [data, setData] = useState({})
+const Main: React.FC<Props> = ({ }) => {
+  const [productId, setProductId] = useState(0)
+  const [productData, setProductData] = useState<Insights | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios(
-        'https://tarant-paulig-api.lab.juiciness.io/api/insights/8569864530471244163'
+        'http://localhost:3000/api/insights/8569864530471244163'
       )
-      setData(result.data)
+      console.log('result gotted', result)
+      setProductData(result.data)
     }
     fetchData()
   }, [])
@@ -27,7 +34,7 @@ const Main: React.FC<Props> = ({ }) => {
       <Col>
         <Heading>Product X</Heading>
         <Container>
-          <InfoLabel label={'sold today'} value={20}/>
+          <InfoLabel label={'sold today'} value={productData?.consumedToday}/>
           <InfoLabel label={'sold yesterday'} value={100}/>
         </Container>
       </Col>

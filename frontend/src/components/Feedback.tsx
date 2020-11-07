@@ -1,6 +1,8 @@
 import React, { useState, Fragment } from 'react'
 import styled from 'styled-components'
 
+import { checkCode, sendFeedback } from '../lib/data'
+
 import { Theme } from '../styles'
 
 const Feedback:React.FC = () => {
@@ -13,7 +15,10 @@ const Feedback:React.FC = () => {
 
   const submitId = () => {
     console.log('id submit', id)
-    setValidId(true)
+    checkCode(id)
+      .then(result => {
+        console.log('res',result)
+      })
   }
 
   const submitFeedback = (rating: number) => {
@@ -22,7 +27,7 @@ const Feedback:React.FC = () => {
   
   return (
       <Col>
-        {validId ?
+        {!validId ?
           <Fragment>
             <Heading>Give your unique id</Heading>
             <Input value={id} onChange={handleInput}/>

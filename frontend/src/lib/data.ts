@@ -15,3 +15,19 @@ export const fetchProducts = async () => {
   )
   return result.data
 }
+
+export const checkCode = async (id: string) => {
+  const result = await axios(
+    baseUrl + '/review/checkCode?code=' + id
+  )
+  return result.data
+}
+
+export const sendFeedback = async (id: string, rating: number) => {
+  const result = await axios.post('/review', {
+      review_uniqueID: id,
+      review: rating,
+      review_ts: new Date()
+  })
+  return result
+}

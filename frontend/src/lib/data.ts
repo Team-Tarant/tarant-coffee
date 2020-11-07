@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'https://tarant-paulig-api.lab.juiciness.io/api'
+const baseUrl = 'http://localhost:3000/api'
 
 export const fetchProductData = async (productId: number) => {
   const result = await axios(

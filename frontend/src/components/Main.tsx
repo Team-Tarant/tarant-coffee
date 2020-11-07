@@ -18,6 +18,7 @@ type Insights = {
 
 const Main: React.FC<Props> = ({ }) => {
   const [productId, setProductId] = useState<number | null>(null)
+  const [productName, setProductName] = useState<string | null>(null)
   const [productData, setProductData] = useState<Insights | null>(null)
 
   useEffect(() => {
@@ -30,12 +31,12 @@ const Main: React.FC<Props> = ({ }) => {
   return (
     <Col>
       <Col>
-        <ProductSelect setProduct={setProductId} />
+        <ProductSelect setProductId={setProductId} setProductName={setProductName}/>
         {productId && !productData ? <Loading /> :
           productId &&
           <div>
-            {productData &&
-              <Product productData={productData} />
+            {productData && productName &&
+              <Product productData={productData} productName={productName}/>
             }
           </div>
 

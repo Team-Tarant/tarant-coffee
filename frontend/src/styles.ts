@@ -5,6 +5,7 @@ export const Theme: any = {
     color: {
         primary: '#56166d',
         secondary: '#ffbfa9',
+        tertiary: '#ffd3c4',
     },
     font: {
         primary: 'Varela Round',

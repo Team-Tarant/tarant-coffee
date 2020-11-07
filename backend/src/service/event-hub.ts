@@ -43,7 +43,7 @@ type Event = {
 
 const generateEvent = (
   eventType: string,
-  eventData: completePurchase | Review
+  eventData: completePurchase | Review //| any
 ) => {
   return {
     event_data: eventData,
@@ -63,6 +63,11 @@ export const postEvent = async (event: Event) => {
   await eventDataBatch.tryAdd({ body: event })
   await producerClient.sendBatch(eventDataBatch)
 }
+
+// export const postCustomEvent = async (eventType: string, eventData: any) => {
+//   const event = generateEvent(eventType, eventData)
+//   await postEvent(event)
+// }
 
 export const postPurchase = async (body: Purchase) => {
   const uniqueReviewId = randomBytes(3).toString('hex')

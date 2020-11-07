@@ -3,8 +3,6 @@ import { subDays, startOfDay, endOfDay } from 'date-fns/fp'
 import { format } from 'date-fns'
 import * as R from 'ramda'
 
-let cachedCafePosData: CafePosData[] = []
-
 const snowflake = new Snowflake({
   account: process.env.ACCOUNT,
   username: process.env.USERNAME,
@@ -78,22 +76,17 @@ const parseWarehouseData = (result: any[]): WebshopData[] =>
     orderNumber: item.ORDER_NUMBER,
   }))
 */
-const getCafePosData = () =>
-  snowflake.execute('select * from cafe_pos_data').then(parseCafePosData)
+const getCafePosData = (productId: string) =>
+  snowflake
+    .execute(
+      'select * from cafe_pos_data where ITEM_CODE = ? and HEADER_BOOKINGDATE >= ?',
+      [productId, R.pipe(subDays(30), startOfDay)(new Date())]
+    )
+    .then(parseCafePosData)
 /*
 const getWarehouseData = () =>
   snowflake.execute('select * from webshop_data').then(parseWarehouseData)
 */
-export const startCafePosDataPoll = async (timeMs: number) => {
-  cachedCafePosData = await getCafePosData()
-  setInterval(
-    () =>
-      getCafePosData().then(data => {
-        cachedCafePosData = data
-      }),
-    timeMs
-  )
-}
 
 /*
 const getCafePosDataForProduct = (productId: string) =>
@@ -129,13 +122,9 @@ const resolveConsumedToday = (events: CafePosData[]) => {
   ).length
 }
 
-export const getInsightsForProduct = (productId: number) => {
-  const filtered = cachedCafePosData.filter(
-    event => event.itemCode === productId
-  )
-  return {
+export const getInsightsForProduct = (productId: string) =>
+  getCafePosData(productId).then(data => ({
     id: productId,
-    consumedToday: resolveConsumedToday(filtered),
-    consumedLastMonth: resolveLast30Days(filtered),
-  }
-}
+    consumedToday: resolveConsumedToday(data),
+    consumedLastMonth: resolveLast30Days(data),
+  }))

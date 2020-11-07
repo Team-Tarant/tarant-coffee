@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import InfoLabel from './InfoLabel';
@@ -9,6 +9,10 @@ type Props = {}
 
 const Main: React.FC<Props> = ({ }) => {
 
+  const [soldToday, setSoldToday] = useState(0)
+  const [soldYesterday, setSoldYesterday] = useState(0)
+  const [soldLastMonth, setSoldLastMonth] = useState([])
+
   return (
     <Col>
       <Col>
@@ -16,7 +20,6 @@ const Main: React.FC<Props> = ({ }) => {
         <Container>
           <InfoLabel label={'sold today'} value={20}/>
           <InfoLabel label={'sold yesterday'} value={100}/>
-          <InfoLabel label={'Interesting but very, very long value label asdfasdf ölkj js lekals jdkje lkasj k'} value={100}/>
         </Container>
       </Col>
     </Col>
@@ -42,7 +45,7 @@ const Container: any = styled.div`
 const Heading: any = styled.p`
   color: ${Theme.color.primary};
   font-family: ${Theme.font.secondary};
-  font-size: 7rem;
+  font-size: 3rem;
   margin: 0;
 `;
 

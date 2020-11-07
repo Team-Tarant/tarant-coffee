@@ -4,7 +4,7 @@ import { createGlobalStyle, css } from 'styled-components';
 export const Theme: any = {
     color: {
         primary: '#2C0E37',
-        secondary: '#DAA89B',
+        secondary: '#ded8d6',
     },
     font: {
         primary: 'Varela Round',

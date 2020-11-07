@@ -21,24 +21,24 @@ const Row: any = styled.div`
   align-items: flex-end;
   display: flex;
   flex-direction: row;
-  border: 3px solid ${ Theme.color.primary };
   border-radius: .4rem;
-  background-color: ${ Theme.color.primary };
   margin: 2px;
   max-height: 5rem;
+  padding: 0.2rem;
 `;
 
 const Text: any = styled.div`
-  color: ${Theme.color.secondary};
+  color: ${Theme.color.primary};
 `;
 
 const LabelText: any = styled(Text)`
-  font-size: 2rem;
+  font-size: 1rem;
   flex-basis: 70%;
 `;
 
 const ValueText: any = styled(Text)`
-  font-size: 3rem;
+  margin-left: 1rem;
+  font-size: 2rem;
 `;
 
 export default InfoLabel;

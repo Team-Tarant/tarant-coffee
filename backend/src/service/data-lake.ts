@@ -142,5 +142,5 @@ export const getInsightsForProduct = (productId: number) =>
 
 export const getProducts = () =>
   snowflake
-    .execute('select distinct(ITEM_CODE) from cafe_pos_data')
+    .execute('select distinct(ITEM_CODE) from team_09.cafe_pos_data')
     .then(data => data.map(({ ITEM_CODE }) => ITEM_CODE))

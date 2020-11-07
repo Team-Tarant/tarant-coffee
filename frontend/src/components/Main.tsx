@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios'
 
 import InfoLabel from './InfoLabel';
 
@@ -9,9 +10,17 @@ type Props = {}
 
 const Main: React.FC<Props> = ({ }) => {
 
-  const [soldToday, setSoldToday] = useState(0)
-  const [soldYesterday, setSoldYesterday] = useState(0)
-  const [soldLastMonth, setSoldLastMonth] = useState([])
+  const [data, setData] = useState({})
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await axios(
+        'https://tarant-paulig-api.lab.juiciness.io/api/insights/8569864530471244163'
+      )
+      setData(result.data)
+    }
+    fetchData()
+  }, [])
 
   return (
     <Col>

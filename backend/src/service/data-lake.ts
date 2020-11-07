@@ -149,16 +149,23 @@ export const getInsightsForProduct = (productId: number) =>
 
 export const getProducts = () =>
   Promise.all([
-    snowflake.execute('select distinct(ITEM_CODE) from team_09.cafe_pos_data'),
     snowflake.execute(
-      `select distinct(ITEM_CODE) from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}`
+      'select distinct(cafe_pos_data.ITEM_CODE), ITEM_NAME from team_09.cafe_pos_data inner join x_pub_team_09.product_info on (cafe_pos_data.ITEM_CODE = product_info.ITEM_CODE)'
+    ),
+    snowflake.execute(
+      `select distinct(x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}.ITEM_CODE), ITEM_NAME from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION} inner join x_pub_team_09.product_info on (cafe_pos_data_v${process.env.TABLEVERSION}.ITEM_CODE = product_info.ITEM_CODE)`
     ),
   ])
     .then(([p1, p2]) => [...p1, ...p2])
     .then(
       R.pipe(
-        R.map(({ ITEM_CODE }) => Number(ITEM_CODE)),
-        R.filter<number>(i => whitelistedProducts.includes(i)),
+        R.map(({ ITEM_CODE, ITEM_NAME }) => ({
+          productId: Number(ITEM_CODE),
+          productName: ITEM_NAME,
+        })),
+        R.filter<{ productId: number; productName: string }>(i =>
+          whitelistedProducts.includes(i.productId)
+        ),
         R.uniq
       )
     )

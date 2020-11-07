@@ -20,7 +20,7 @@ connect()
 app.get('/api/insights/:productId', (req, res) => {
   if (!req.params.productId)
     return res.status(400).json({ error: 'Missing productId path param' })
-  getInsightsForProduct(req.params.productId).then(insights =>
+  getInsightsForProduct(Number(req.params.productId)).then(insights =>
     res.json(insights)
   )
 })

@@ -128,3 +128,8 @@ export const getInsightsForProduct = (productId: string) =>
     consumedToday: resolveConsumedToday(data),
     consumedLastMonth: resolveLast30Days(data),
   }))
+
+export const getProducts = () =>
+  snowflake
+    .execute('select distinct(ITEM_CODE) from cafe_pos_data')
+    .then(data => data.map(({ ITEM_CODE }) => ITEM_CODE))

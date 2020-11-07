@@ -1,6 +1,10 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import { connect, getInsightsForProduct } from './service/data-lake'
+import {
+  connect,
+  getInsightsForProduct,
+  getProducts,
+} from './service/data-lake'
 import express from 'express'
 
 const app = express()
@@ -20,5 +24,9 @@ app.get('/api/insights/:productId', (req, res) => {
     res.json(insights)
   )
 })
+
+app.get('/api/products', (req, res) =>
+  getProducts().then(products => res.json(products))
+)
 
 app.listen(3000, () => console.log('Listening on', PORT, '💩'))

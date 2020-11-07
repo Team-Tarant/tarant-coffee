@@ -5,11 +5,14 @@ import {
   getInsightsForProduct,
   getProducts,
 } from './service/data-lake'
+import { postEvent, getEventHubProperties } from './service/event-hub'
 import express from 'express'
+import bodyParser from 'body-parser'
 import cors from 'cors'
 
 const app = express()
 app.use(cors())
+app.use(bodyParser.json())
 
 const PORT = process.env.PORT || 3000
 
@@ -27,6 +30,16 @@ app.get('/api/insights/:productId', (req, res) => {
 
 app.get('/api/products', (req, res) =>
   getProducts().then(products => res.json(products))
+)
+
+app.get('/api/eventhub-info', (req, res) =>
+  getEventHubProperties().then(data => res.json(data))
+)
+
+app.post('/api/post', (req, res) =>
+  postEvent(req.body)
+    .then(() => res.json('post successfull'))
+    .catch(err => console.error(err))
 )
 
 app.listen(3000, () => console.log('Listening on', PORT, '💩'))

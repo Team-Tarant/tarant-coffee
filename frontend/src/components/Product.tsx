@@ -13,7 +13,8 @@ type Insights = {
 }
 
 type Props = {
-  productData: Insights
+  productData: Insights,
+  productName: string,
 }
 
 const getPreviousDaySales = (consumedLastMonth: {[key: string]:number}): number => {
@@ -22,12 +23,12 @@ const getPreviousDaySales = (consumedLastMonth: {[key: string]:number}): number 
   return consumedLastMonth[yesterday.format('DD.MM.YYYY')] || 0
 }
 
-const Product:React.FC<Props> = ({ productData }) => {
+const Product:React.FC<Props> = ({ productData, productName }) => {
   const {id, consumedToday, consumedLastMonth} = productData
   const soldYesterday: number = getPreviousDaySales(consumedLastMonth)
   return (
     <div>
-      <Heading>Product {id}</Heading>
+      <Heading>{productName}</Heading>
       <Container>
         <InfoLabel label={'sold today'} value={consumedToday}/>
         <InfoLabel label={'sold yesterday'} value={soldYesterday}/>

@@ -4,10 +4,11 @@ import { fetchProducts } from '../lib/data'
 import Select from 'react-select'
 
 type Props = {
-  setProduct: (id: number | null) => void,
+  setProductId: (id: number | null) => void,
+  setProductName: (name: string | null) => void,
 }
 
-const ProductSelect = ({setProduct}: Props) => {
+const ProductSelect = ({setProductId, setProductName}: Props) => {
   const [products, setProducts] = useState<any>([])
   const [selectOptions, setSelectOptions] = useState<any>()
 
@@ -16,10 +17,13 @@ const ProductSelect = ({setProduct}: Props) => {
   },[])
 
   useEffect(() => {
-    setSelectOptions(products.map(p => { return {value: p.toString(), label: p.toString()}}))
+    setSelectOptions(products.map(p => { return {value: p.productId.toString(), label: p.productName}}))
   },[products])
 
-  return <Select options={selectOptions} onChange={option => setProduct(option.value)}/>
+  return <Select options={selectOptions} onChange={option => {
+    setProductId(option.value)
+    setProductName(option.label)
+  }}/>
 }
 
 export default ProductSelect

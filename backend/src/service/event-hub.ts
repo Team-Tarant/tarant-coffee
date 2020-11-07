@@ -1,28 +1,34 @@
-import {
-  EventHubProducerClient,
-  EventHubConsumerClient,
-  earliestEventPosition,
-} from '@azure/event-hubs'
+import { EventHubProducerClient } from '@azure/event-hubs'
 
 const producerClient = new EventHubProducerClient(
   process.env.EVENTHUB_CONNECTION
 )
 
-const consumerClient = new EventHubConsumerClient(
-  process.env.EVENTHUB_CONSUMER_GROUP,
-  process.env.EVENTHUB_CONNECTION
-)
+// type Review = {
+//   review_uniqueID: string
+//   review: number
+//   review_ts: Date
+// }
 
-const subscriptionOptions = {
-  startPosition: earliestEventPosition,
-}
+// type Purchase = {
+//   HEADER_ID: string
+//   ITEM_ID: string
+//   HEADER_BOOKINGDATE: Date
+//   HEADER_JOURNALTIME: Date
+//   HEADER_TERMINAL: string
+//   HEADER_CASHIER: string
+//   HEADER_TOTAL: number
+//   ITEM_CODE: number
+//   ITEM_DESCRIPTION: string
+//   ITEM_AMT: number
+//   ITEM_QTY: number
+//   ITEM_UNIT: string
+//   ITEM_NORMAL_PRICE: number
+//   REVIEW_UNQIUE_KEY: string
+// }
 
 type Event = {
-  event_data: {
-    purchaseId: string
-    boughtItems: string[]
-    bought_ts: Date
-  }
+  event_data: any
   event_domain: string
   event_id: string
   event_source: string
@@ -30,25 +36,8 @@ type Event = {
   event_type: string
 }
 
-export const getPartitionIds = () => producerClient.getPartitionIds()
-
-export const subscription = async () => {
-  let partitionIds = await consumerClient.getPartitionIds()
-  consumerClient.subscribe(
-    partitionIds[0],
-    {
-      processEvents: (events, context) => {
-        console.log('Received event count: ', events.length)
-        return Promise.resolve()
-      },
-      processError: (err, context) => {
-        console.log('Error: ', err)
-        return Promise.resolve()
-      },
-    },
-    subscriptionOptions
-  )
-}
+export const getEventHubProperties = async () =>
+  await producerClient.getEventHubProperties()
 
 export const postEvent = async (event: Event) => {
   const eventDataBatch = await producerClient.createBatch()

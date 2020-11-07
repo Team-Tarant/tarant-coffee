@@ -7,7 +7,6 @@ const snowflake = new Snowflake({
   account: process.env.ACCOUNT,
   username: process.env.USERNAME,
   password: process.env.PASSWORD,
-  schema: 'TEAM_09',
   warehouse: 'WH01',
   database: 'DEV_EDW_JUNCTION',
 })
@@ -49,9 +48,10 @@ const parseCafePosData = (result: any[]): CafePosData[] =>
 
 const getCafePosData = (productId: number) =>
   snowflake
-    .execute('select * from cafe_pos_data where HEADER_BOOKINGDATE >= ?', [
-      R.pipe(subDays(30), startOfDay)(new Date()),
-    ])
+    .execute(
+      'select * from team_09.cafe_pos_data where HEADER_BOOKINGDATE >= ?',
+      [R.pipe(subDays(30), startOfDay)(new Date())]
+    )
     .then(parseCafePosData)
     .then(R.filter(({ itemCode }) => itemCode === productId))
 

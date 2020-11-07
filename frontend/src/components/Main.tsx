@@ -29,8 +29,12 @@ const Main: React.FC<Props> = ({ }) => {
     <Col>
       <Col>
         <ProductSelect setProduct={setProductId}/>
-        { productId && productData &&
-          <Product productData={productData}/>
+        { productId && 
+          <div>
+            {productData ?
+              <Product productData={productData}/> : <Loading/>
+            }
+          </div>
         }
       </Col>
     </Col>
@@ -50,7 +54,7 @@ const Row: any = styled.div`
 `
 
 const Loading: any = styled.img.attrs(() => ({
-  src: require('../assets/loading.svg'),
+  src: require('../assets/LoadingIndicator.svg').default,
 }))`
   color: ${Theme.color.secondary};
   width: 10rem;

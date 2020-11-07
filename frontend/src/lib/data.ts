@@ -24,7 +24,7 @@ export const checkCode = async (id: string) => {
 }
 
 export const sendFeedback = async (id: string, rating: number) => {
-  const result = await axios.post('/review', {
+  const result = await axios.post(baseUrl + '/review', {
       review_uniqueID: id,
       review: rating,
       review_ts: new Date()

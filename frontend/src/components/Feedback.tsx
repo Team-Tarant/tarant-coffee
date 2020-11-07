@@ -1,6 +1,8 @@
 import React, { useState, Fragment } from 'react'
 import styled from 'styled-components'
 
+import { useHistory } from 'react-router-dom'
+
 import { checkCode, sendFeedback } from '../lib/data'
 
 import { Theme } from '../styles'
@@ -8,43 +10,65 @@ import { Theme } from '../styles'
 const Feedback:React.FC = () => {
   const [id, setId] = useState<string>('')
   const [validId, setValidId] = useState<Boolean>(false)
+  const [loading, setLoading] = useState<Boolean>(false)
+  const [success, setSuccess] = useState<Boolean>(false)
+  const history = useHistory()
 
   const handleInput = (event) => {
     event.target.value.length <= 20 && setId(event.target.value)
   }
 
   const submitId = () => {
-    console.log('id submit', id)
+    setLoading(true)
     checkCode(id)
-      .then(result => {
-        console.log('res',result)
+      .then(({result}) => {
+        setValidId(result)
+        setLoading(false)
       })
   }
 
   const submitFeedback = (rating: number) => {
-    console.log('submitted feedback')
+    setLoading(true)
+    sendFeedback(id, rating)
+      .then(() => {
+        setLoading(false)
+        setSuccess(true)
+      })
   }
   
   return (
       <Col>
-        {!validId ?
+        {!success ? <Fragment>
+          {!validId ?
+            <Fragment>
+              <Heading>Give your unique id</Heading>
+              <Input value={id} onChange={handleInput}/>
+          {loading ? <Loading /> : <Button onClick={submitId}>Next</Button> }
+            </Fragment>
+          : <Fragment>
+              <Heading>How did you enjoy your Paulig experience?</Heading>
+              {loading ? <Loading /> :
+              <FeedbackRow>
+                <FeedbackButton onClick={() => submitFeedback(-1)}>💩</FeedbackButton>
+                <FeedbackButton onClick={() => submitFeedback(0)}>🤷‍♀️</FeedbackButton>
+                <FeedbackButton onClick={() => submitFeedback(1)}>😋</FeedbackButton>
+              </FeedbackRow>}
+            </Fragment>}
+          </Fragment>:
           <Fragment>
-            <Heading>Give your unique id</Heading>
-            <Input value={id} onChange={handleInput}/>
-            <Button onClick={submitId}>Next</Button>
-          </Fragment>
-        : <Fragment>
-            <Heading>How did you enjoy your Paulig experience?</Heading>
-            <FeedbackRow>
-              <FeedbackButton onClick={() => submitFeedback(-1)}>💩</FeedbackButton>
-              <FeedbackButton onClick={() => submitFeedback(0)}>🤷‍♀️</FeedbackButton>
-              <FeedbackButton onClick={() => submitFeedback(1)}>😋</FeedbackButton>
-            </FeedbackRow>
+            <Heading>THANK YOU FOR YOUR FEEDBACK</Heading>
           </Fragment>}
       </Col>
   )
 }
 
+const Loading: any = styled.img.attrs(() => ({
+  src: require('../assets/LoadingIndicator.svg').default,
+}))`
+  color: ${Theme.color.secondary};
+  width: 5rem;
+  margin: 0 auto;
+`;
 
 const Col: any = styled.div`
   display: flex;
@@ -96,6 +120,7 @@ const FeedbackButton: any = styled.button`
   background-color: ${ Theme.color.tertiary };
   border: 3px solid ${ Theme.color.primary };
   border-radius: 1rem;
+  outline: none;
 `
 
 

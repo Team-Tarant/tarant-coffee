@@ -62,7 +62,6 @@ export const postPurchase = async (body: Purchase) => {
     `cafe_pos_data_v${process.env.TABLEVERSION}`,
     body
   )
-  console.log('purchaseEvent', purchaseEvent)
   await postEvent(purchaseEvent)
 }
 
@@ -71,6 +70,5 @@ export const postReview = async (body: Review) => {
     `review_data_v${process.env.TABLEVERSION}`,
     body
   )
-  console.log('reviewEvent', reviewEvent)
   await postEvent(reviewEvent)
 }

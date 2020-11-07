@@ -3,8 +3,8 @@ import { createGlobalStyle, css } from 'styled-components';
 // try coolors.co
 export const Theme: any = {
     color: {
-        primary: '#2C0E37',
-        secondary: '#ded8d6',
+        primary: '#56166d',
+        secondary: '#ffbfa9',
     },
     font: {
         primary: 'Varela Round',
@@ -30,7 +30,7 @@ export const GlobalStyle: any = createGlobalStyle`
             }
             height: 100%;
             display: flex;
-            margin: 0;
+            margin: auto;
             padding: 0;
         }
         

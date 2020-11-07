@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import moment from 'moment'
 
 import InfoLabel from './InfoLabel'
+import LastMonthChart from './LastMonthChart'
 import { Theme } from '../styles'
 
 type Insights = {
@@ -30,6 +31,7 @@ const Product:React.FC<Props> = ({ productData }) => {
       <Container>
         <InfoLabel label={'sold today'} value={consumedToday}/>
         <InfoLabel label={'sold yesterday'} value={soldYesterday}/>
+        <LastMonthChart consumedLastMonth={consumedLastMonth}/>
       </Container>
     </div>
   )

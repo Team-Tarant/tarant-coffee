@@ -10,10 +10,11 @@ import { Theme } from '../styles'
 
 type Props = {}
 
-type Insights = {
+export type Insights = {
   consumedLastMonth: { [key: string]: number },
   consumedToday: number,
   id: number,
+  satisfaction: number
 }
 
 const Main: React.FC<Props> = ({ }) => {
@@ -31,12 +32,12 @@ const Main: React.FC<Props> = ({ }) => {
   return (
     <Col>
       <Col>
-        <ProductSelect setProductId={setProductId} setProductName={setProductName}/>
+        <ProductSelect setProductId={setProductId} setProductName={setProductName} />
         {productId && !productData ? <Loading /> :
           productId &&
           <div>
             {productData && productName &&
-              <Product productData={productData} productName={productName}/>
+              <Product productData={productData} productName={productName} />
             }
           </div>
 

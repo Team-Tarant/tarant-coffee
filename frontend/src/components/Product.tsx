@@ -5,34 +5,30 @@ import moment from 'moment'
 import InfoLabel from './InfoLabel'
 import LastMonthChart from './LastMonthChart'
 import { Theme } from '../styles'
-
-type Insights = {
-  consumedLastMonth: {[key: string]:number},
-  consumedToday: number,
-  id: number,
-}
+import { Insights } from './Main'
 
 type Props = {
   productData: Insights,
   productName: string,
 }
 
-const getPreviousDaySales = (consumedLastMonth: {[key: string]:number}): number => {
+const getPreviousDaySales = (consumedLastMonth: { [key: string]: number }): number => {
   const yesterday: moment.Moment = moment().subtract(1, 'days')
 
   return consumedLastMonth[yesterday.format('DD.MM.YYYY')] || 0
 }
 
-const Product:React.FC<Props> = ({ productData, productName }) => {
-  const {id, consumedToday, consumedLastMonth} = productData
+const Product: React.FC<Props> = ({ productData, productName }) => {
+  const { id, consumedToday, consumedLastMonth, satisfaction } = productData
   const soldYesterday: number = getPreviousDaySales(consumedLastMonth)
   return (
     <div>
       <Heading>{productName}</Heading>
       <Container>
-        <InfoLabel label={'sold today'} value={consumedToday}/>
-        <InfoLabel label={'sold yesterday'} value={soldYesterday}/>
-        <LastMonthChart consumedLastMonth={consumedLastMonth}/>
+        <InfoLabel label={'sold today'} value={consumedToday} />
+        <InfoLabel label={'sold yesterday'} value={soldYesterday} />
+        <InfoLabel label={'satisfaction'} value={satisfaction} />
+        <LastMonthChart consumedLastMonth={consumedLastMonth} />
       </Container>
     </div>
   )

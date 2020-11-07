@@ -133,6 +133,33 @@ const resolveSatisfaction = (events: CafePosData[]) => {
   )
 }
 
+const resolveTodTrend = (events: CafePosData[]) => {
+  const now = new Date()
+  const scanEnd = R.pipe(subDays(1), endOfDay)
+  const scanBegin = R.pipe(subDays(30), startOfDay)
+
+  return R.pipe(
+    (events: CafePosData[]) =>
+      R.filter(
+        ({ headerBookingDate }) =>
+          headerBookingDate >= scanBegin(now) &&
+          headerBookingDate <= scanEnd(now),
+        events
+      ),
+    R.groupBy(({ headerBookingDate }) => format(headerBookingDate, 'iiii')),
+    R.mapObjIndexed(data =>
+      R.pipe(
+        (data: CafePosData[]) =>
+          R.groupBy(
+            ({ headerBookingDate }) => format(headerBookingDate, 'HH'),
+            data
+          ),
+        R.mapObjIndexed(e => R.sum(e.map(i => i.itemQty)))
+      )(data)
+    )
+  )(events)
+}
+
 /*
   We need to handle productId as a number, because it overflows because the datatype is integer
   in the database.
@@ -144,16 +171,23 @@ export const getInsightsForProduct = (productId: number) =>
       id: productId,
       consumedToday: resolveConsumedToday(data),
       consumedLastMonth: resolveLast30Days(data),
+      todTrend: resolveTodTrend(data),
       satisfaction: await resolveSatisfaction(data),
     }))
 
 export const getProducts = () =>
   Promise.all([
     snowflake.execute(
-      'select distinct(cafe_pos_data.ITEM_CODE), ITEM_NAME from team_09.cafe_pos_data inner join x_pub_team_09.product_info on (cafe_pos_data.ITEM_CODE = product_info.ITEM_CODE)'
+      `select distinct(cafe_pos_data.ITEM_CODE), ITEM_NAME
+      from team_09.cafe_pos_data
+      inner join x_pub_team_09.product_info
+      on (cafe_pos_data.ITEM_CODE = product_info.ITEM_CODE)`
     ),
     snowflake.execute(
-      `select distinct(x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}.ITEM_CODE), ITEM_NAME from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION} inner join x_pub_team_09.product_info on (cafe_pos_data_v${process.env.TABLEVERSION}.ITEM_CODE = product_info.ITEM_CODE)`
+      `select distinct(x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}.ITEM_CODE), ITEM_NAME
+      from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION}
+      inner join x_pub_team_09.product_info
+      on (cafe_pos_data_v${process.env.TABLEVERSION}.ITEM_CODE = product_info.ITEM_CODE)`
     ),
   ])
     .then(([p1, p2]) => [...p1, ...p2])

@@ -1,5 +1,6 @@
 import { EventHubProducerClient } from '@azure/event-hubs'
 import { v4 as uuidv4 } from 'uuid'
+import { randomBytes } from 'crypto'
 
 const producerClient = new EventHubProducerClient(
   process.env.EVENTHUB_CONNECTION
@@ -25,8 +26,11 @@ type Purchase = {
   ITEM_QTY: number
   ITEM_UNIT: string
   ITEM_NORMAL_PRICE: number
-  REVIEW_UNQIUE_KEY: string
 }
+
+type completePurchase = {
+  uniqueReviewId: string
+} & Purchase
 
 type Event = {
   event_data: Purchase | Review
@@ -37,7 +41,10 @@ type Event = {
   event_type: string
 }
 
-const generateEvent = (eventType: string, eventData: Purchase | Review) => {
+const generateEvent = (
+  eventType: string,
+  eventData: completePurchase | Review
+) => {
   return {
     event_data: eventData,
     event_domain: 'team_09',
@@ -58,11 +65,16 @@ export const postEvent = async (event: Event) => {
 }
 
 export const postPurchase = async (body: Purchase) => {
+  const uniqueReviewId = randomBytes(3).toString('hex')
   const purchaseEvent = generateEvent(
     `cafe_pos_data_v${process.env.TABLEVERSION}`,
-    body
+    {
+      ...body,
+      uniqueReviewId,
+    }
   )
   await postEvent(purchaseEvent)
+  return uniqueReviewId
 }
 
 export const postReview = async (body: Review) => {

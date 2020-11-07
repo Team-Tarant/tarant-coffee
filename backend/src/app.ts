@@ -44,7 +44,7 @@ app.get('/api/eventhub-info', (req, res) =>
 
 app.post('/api/purchase', (req, res) =>
   postPurchase(req.body)
-    .then(() => res.json('Purchase posted successfully'))
+    .then(uniqueReviewId => res.json({ uniqueReviewId }))
     .catch(err => console.error(err))
 )
 

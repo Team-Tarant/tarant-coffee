@@ -11,7 +11,7 @@ import { Theme } from '../styles'
 type Props = {}
 
 type Insights = {
-  consumedLastMonth: {[key: string]:number},
+  consumedLastMonth: { [key: string]: number },
   consumedToday: number,
   id: number,
 }
@@ -21,18 +21,20 @@ const Main: React.FC<Props> = ({ }) => {
   const [productData, setProductData] = useState<Insights | null>(null)
 
   useEffect(() => {
-    if (productId)
+    if (productId) {
+      setProductData(null)
       fetchProductData(productId).then(setProductData)
+    }
   }, [productId])
 
   return (
     <Col>
       <Col>
-        <ProductSelect setProduct={setProductId}/>
-        { productId && 
+        <ProductSelect setProduct={setProductId} />
+        {productId &&
           <div>
             {productData ?
-              <Product productData={productData}/> : <Loading/>
+              <Product productData={productData} /> : <Loading />
             }
           </div>
         }

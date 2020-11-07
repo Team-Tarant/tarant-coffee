@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tarant-paulig
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    app: tarant-paulig
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tarant-paulig
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tarant-paulig
+  template:
+    metadata:
+      labels:
+        app: tarant-paulig
+    spec:
+      containers:
+        - name: tarant-paulig
+          image: registry.digitalocean.com/merg-registry/tarant-paulig:v8
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: tarant-paulig-secrets
+                  key: ACCOUNT
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: tarant-paulig-secrets
+                  key: USERNAME
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tarant-paulig-secrets
+                  key: PASSWORD
+            - name: EVENTHUB_CONNECTION
+              valueFrom:
+                secretKeyRef:
+                  name: tarant-paulig-secrets
+                  key: EVENTHUB_CONNECTION
+            - name: TABLEVERSION
+              value: '5'

@@ -29,6 +29,17 @@ const Main: React.FC<Props> = ({ }) => {
     }
   }, [productId])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (productId)
+        fetchProductData(productId).then(setProductData)
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [productId]);
+
   return (
     <Col>
       <Col>

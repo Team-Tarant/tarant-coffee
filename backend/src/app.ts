@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 import {
+  checkReviewCode,
   connect,
   getInsightsForProduct,
   getProducts,
@@ -60,5 +61,11 @@ app.post('/api/review', (req, res) =>
 //     .then(() => res.json('Custom data posted successfully'))
 //     .catch(err => console.error(err))
 // )
+
+app.get('/api/review/checkCode', (req, res) =>
+  checkReviewCode(req.query.code.toString()).then(result =>
+    res.json({ result })
+  )
+)
 
 app.listen(3000, () => console.log('Listening on', PORT, '💩'))

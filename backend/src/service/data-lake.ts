@@ -162,3 +162,11 @@ export const getProducts = () =>
         R.uniq
       )
     )
+
+export const checkReviewCode = (code: string) =>
+  snowflake
+    .execute(
+      `select UNIQUEREVIEWID from x_pub_team_09.cafe_pos_data_v${process.env.TABLEVERSION} where UNIQUEREVIEWID = ?`,
+      [code]
+    )
+    .then(result => (result.length === 0 ? false : true))

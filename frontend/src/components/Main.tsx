@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import InfoLabel from './InfoLabel';
+
 import { Theme } from '../styles';
 
 type Props = {}
@@ -9,22 +11,14 @@ const Main: React.FC<Props> = ({ }) => {
 
   return (
     <Col>
-      <Row>
+      <Col>
+        <Heading>Product X</Heading>
         <Container>
-          <Heading>This</Heading>
+          <InfoLabel label={'sold today'} value={20}/>
+          <InfoLabel label={'sold yesterday'} value={100}/>
+          <InfoLabel label={'Interesting but very, very long value label asdfasdf ölkj js lekals jdkje lkasj k'} value={100}/>
         </Container>
-        <Container>
-          <Heading>is</Heading>
-        </Container>
-      </Row>
-      <Row>
-        <Container>
-          <Heading>a template.</Heading>
-        </Container>
-        <Container>
-          <Loading />
-        </Container>
-      </Row>
+      </Col>
     </Col>
   )
 }
@@ -36,24 +30,20 @@ const Col: any = styled.div`
   padding: 5px;
 `;
 
-const Row: any = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-`;
 
 const Container: any = styled.div`
   display: flex;
-  flex: 1;
-  background-color: ${Theme.color.primary};
   margin: 5px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
 `;
 
 const Heading: any = styled.p`
-  color: ${Theme.color.secondary};
+  color: ${Theme.color.primary};
   font-family: ${Theme.font.secondary};
   font-size: 7rem;
-  margin: auto;
+  margin: 0;
 `;
 
 const Loading: any = styled.img.attrs(() => ({

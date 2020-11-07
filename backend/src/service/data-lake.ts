@@ -27,21 +27,7 @@ type CafePosData = {
   itemUnit: string
   itemNormalPrice: number
 }
-/*
-type WebshopData = {
-  address: string
-  city: string
-  country: string
-  customerName: string
-  orderQuantity: number
-  orderTime: Date
-  productCode: number
-  productSubgroup: string
-  revenue: number
-  zipCode: string
-  orderNumber: number
-}
-*/
+
 export const connect = () => snowflake.connect()
 
 const parseCafePosData = (result: any[]): CafePosData[] =>
@@ -60,22 +46,7 @@ const parseCafePosData = (result: any[]): CafePosData[] =>
     itemUnit: item.ITEM_UNIT,
     itemNormalPrice: item.ITEM_NORMAL_PRICE,
   }))
-/*
-const parseWarehouseData = (result: any[]): WebshopData[] =>
-  result.map(item => ({
-    address: item.ADDRESS,
-    city: item.CITY,
-    country: item.COUNTRY,
-    customerName: item.CUSTOMER_NAME,
-    orderQuantity: item.ORDER_QUANTITY,
-    orderTime: item.ORDER_TIME,
-    productCode: item.PRODUCT_CODE,
-    productSubgroup: item.PRODUCT_NAME,
-    revenue: item.REVENUE,
-    zipCode: item.ZIP_CODE,
-    orderNumber: item.ORDER_NUMBER,
-  }))
-*/
+
 const getCafePosData = (productId: number) =>
   snowflake
     .execute('select * from cafe_pos_data where HEADER_BOOKINGDATE >= ?', [
@@ -83,17 +54,6 @@ const getCafePosData = (productId: number) =>
     ])
     .then(parseCafePosData)
     .then(R.filter(({ itemCode }) => itemCode === productId))
-/*
-const getWarehouseData = () =>
-  snowflake.execute('select * from webshop_data').then(parseWarehouseData)
-*/
-
-/*
-const getCafePosDataForProduct = (productId: string) =>
-  snowflake
-    .execute('select * from cafe_pos_data where ITEM_CODE = ?', [productId])
-    .then(parseCafePosData)
-    */
 
 const resolveLast30Days = (events: CafePosData[]) => {
   const now = new Date()
@@ -122,6 +82,10 @@ const resolveConsumedToday = (events: CafePosData[]) => {
   ).length
 }
 
+/*
+  We need to handle productId as a number, because it overflows because the datatype is integer
+  in the database.
+*/
 export const getInsightsForProduct = (productId: number) =>
   getCafePosData(productId).then(data => ({
     id: productId,

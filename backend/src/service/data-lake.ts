@@ -2,6 +2,7 @@ import { Snowflake } from 'snowflake-promise'
 import { subDays, startOfDay, endOfDay } from 'date-fns/fp'
 import { format } from 'date-fns'
 import * as R from 'ramda'
+import { Review } from './event-hub'
 
 const snowflake = new Snowflake({
   account: process.env.ACCOUNT,
@@ -25,6 +26,7 @@ type CafePosData = {
   itemQty: number
   itemUnit: string
   itemNormalPrice: number
+  uniqueReviewId?: string
 }
 
 export const connect = () => snowflake.connect()
@@ -44,6 +46,14 @@ const parseCafePosData = (result: any[]): CafePosData[] =>
     itemQty: Number(item.ITEM_QTY),
     itemUnit: item.ITEM_UNIT,
     itemNormalPrice: Number(item.ITEM_NORMAL_PRICE),
+    uniqueReviewId: item.UNIQUEREVIEWID,
+  }))
+
+const parseReviewData = (result: any[]): Review[] =>
+  result.map(item => ({
+    review: Number(item.REVIEW),
+    review_ts: new Date(item.REVIEW_TS),
+    review_uniqueID: item.REVIEW_UNIQUEID,
   }))
 
 const getCafePosData = (productId: number) =>
@@ -68,6 +78,16 @@ const getNewCafePosData = (productId: number) =>
           productId === itemCode &&
           headerBookingDate >= R.pipe(subDays(30), startOfDay)(new Date())
       )
+    )
+
+const getReviewsByIds = (uniqueIds: string[]) =>
+  snowflake
+    .execute(
+      `select * from x_pub_team_09.review_data_v${process.env.TABLEVERSION}`
+    ) // shit library. doesn't support arrays as input
+    .then(parseReviewData)
+    .then(
+      R.filter(({ review_uniqueID }) => uniqueIds.includes(review_uniqueID))
     )
 
 const resolveLast30Days = (events: CafePosData[]) => {
@@ -97,6 +117,15 @@ const resolveConsumedToday = (events: CafePosData[]) => {
   ).length
 }
 
+const resolveSatisfaction = (events: CafePosData[]) => {
+  const reviewIds = events
+    .map(({ uniqueReviewId }) => uniqueReviewId)
+    .filter(i => !!i)
+  return getReviewsByIds(R.uniq(reviewIds)).then(
+    reviews => (reviews.reduce((p, c) => p + c.review, 0) / reviews.length) * 10
+  )
+}
+
 /*
   We need to handle productId as a number, because it overflows because the datatype is integer
   in the database.
@@ -104,10 +133,11 @@ const resolveConsumedToday = (events: CafePosData[]) => {
 export const getInsightsForProduct = (productId: number) =>
   Promise.all([getCafePosData(productId), getNewCafePosData(productId)])
     .then(([oldData, newData]) => [...newData, ...oldData])
-    .then(data => ({
+    .then(async data => ({
       id: productId,
       consumedToday: resolveConsumedToday(data),
       consumedLastMonth: resolveLast30Days(data),
+      satisfaction: await resolveSatisfaction(data),
     }))
 
 export const getProducts = () =>

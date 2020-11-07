@@ -6,7 +6,7 @@ const producerClient = new EventHubProducerClient(
   process.env.EVENTHUB_CONNECTION
 )
 
-type Review = {
+export type Review = {
   review_uniqueID: string
   review: number
   review_ts: Date

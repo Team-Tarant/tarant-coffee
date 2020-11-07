@@ -26,3 +26,6 @@ def predict():
     result = {'monthly_quantity': pred, 'item_code': item_code}
 
     return result
+
+if __name__ == '__main__':
+    app.run(threaded=True, port=5000)

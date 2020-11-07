@@ -106,15 +106,15 @@ const resolveLast30Days = (events: CafePosData[]) => {
     R.groupBy(({ headerBookingDate }) =>
       format(headerBookingDate, 'dd.LL.yyyy')
     ),
-    R.mapObjIndexed(i => i.length)
+    R.mapObjIndexed(i => i.reduce((p, c) => p + c.itemAmount, 0))
   )(events)
 }
 
 const resolveConsumedToday = (events: CafePosData[]) => {
   const now = new Date()
-  return events.filter(
-    ({ headerBookingDate }) => headerBookingDate >= startOfDay(now)
-  ).length
+  return events
+    .filter(({ headerBookingDate }) => headerBookingDate >= startOfDay(now))
+    .reduce((p, c) => p + c.itemAmount, 0)
 }
 
 const resolveSatisfaction = (events: CafePosData[]) => {

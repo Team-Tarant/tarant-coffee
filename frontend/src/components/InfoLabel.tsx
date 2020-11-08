@@ -5,10 +5,10 @@ import { Theme } from '../styles';
 
 type Props = {
   label: string,
-  value?: number,
+  value?: number | string,
 }
 
-const InfoLabel: React.FC<Props> = ({label, value }) => {
+const InfoLabel: React.FC<Props> = ({ label, value }) => {
   return (
     <Row>
       <LabelText>{label}</LabelText>
@@ -25,7 +25,7 @@ const Row: any = styled.div`
   margin: 2px;
   max-height: 5rem;
   padding: 0.2rem;
-  background-color: ${ Theme.color.tertiary };
+  background-color: ${Theme.color.tertiary};
   padding: 7px;
 `;
 

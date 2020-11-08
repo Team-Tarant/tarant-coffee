@@ -29,10 +29,10 @@ const Product: React.FC<Props> = ({ productData, productName }) => {
         <Row>
           <InfoLabel label={'sold today'} value={consumedToday} />
           <InfoLabel label={'sold yesterday'} value={soldYesterday} />
-          <InfoLabel label={'satisfaction'} value={satisfaction} />
+          <InfoLabel label={'customer rating'} value={`${satisfaction.toFixed(2)}/10`} />
         </Row>
         <LastMonthChart consumedLastMonth={consumedLastMonth} />
-        <TodTrendChart todTrend={todTrend}/>
+        <TodTrendChart todTrend={todTrend} />
       </Container>
     </div>
   )

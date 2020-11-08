@@ -43,9 +43,9 @@ const TodTrendChart: React.FC<Props> = ({ todTrend }) => {
     dataLabels: {
       enabled: false
     },
-    colors: ["#ffbfa9"],
+    colors: ["#008FFB"],
     title: {
-      text: 'Sales by time of day'
+      text: 'Sales by time of day (last 30 days)'
     },
   }
 

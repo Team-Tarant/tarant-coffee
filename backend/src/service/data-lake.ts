@@ -151,7 +151,10 @@ const resolveTodTrend = (events: CafePosData[]) => {
       R.pipe(
         (data: CafePosData[]) =>
           R.groupBy(
-            ({ headerBookingDate }) => format(headerBookingDate, 'HH'),
+            ({ headerBookingDate, headerJournaltime }) =>
+              format(headerBookingDate, 'HH') === '03'
+                ? headerJournaltime.split(':')[0]
+                : format(headerBookingDate, 'HH'),
             data
           ),
         R.mapObjIndexed(e => R.sum(e.map(i => i.itemQty)))

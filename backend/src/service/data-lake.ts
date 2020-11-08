@@ -152,7 +152,8 @@ const resolveTodTrend = (events: CafePosData[]) => {
         (data: CafePosData[]) =>
           R.groupBy(
             ({ headerBookingDate, headerJournaltime }) =>
-              format(headerBookingDate, 'HH') === '03'
+              format(headerBookingDate, 'HH') === '03' ||
+              format(headerBookingDate, 'HH') === '00'
                 ? headerJournaltime.split(':')[0]
                 : format(headerBookingDate, 'HH'),
             data

@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: tarant-paulig
-          image: registry.digitalocean.com/merg-registry/tarant-paulig:v13
+          image: registry.digitalocean.com/merg-registry/tarant-paulig:v14
           ports:
             - containerPort: 3000
           env:
